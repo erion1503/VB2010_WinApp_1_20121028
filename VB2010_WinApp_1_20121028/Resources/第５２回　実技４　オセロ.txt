@@ -1,0 +1,170 @@
+１．はじめに
+
+２．プログラムの設計
+■表２：作成する主なクラス
+クラス		説明
+Cell		オセロのセル(升目)を表します。セルの状態(黒・白・なし)の管理や、セルへのフォーカスの移動、グラフィックの描画を行います。
+ReverseGrid	オセロのグリッド(盤面)を表します。石を置くためのメソッドや、ひっくり返すメソッドとそれに関連するイベント、セルの管理、描画処理を行います。
+Computer	オセロのプレイヤーとなる人工知能を表します。
+
+３．グリッドの描画
+■リスト３：ReverseGrid.vbに記述する。グリッドの描画。
+Public Sub Draw(ByVal g As Graphics)
+■リスト４：Form1に記述する。描画ロジックの呼び出し。
+Private Sub PictureBox1_Paint(ByVal sender As Object, ByVal e As System.Windows.Forms.PaintEventArgs) Handles PictureBox1.Paint
+
+４．クリックしたセルに石を置く
+■リスト５：Constants.vbの最初の状態。この２行は削除してしまう。
+Public Class Constants
+■リスト６：Constants.vbに記述する。セルの状態を表す列挙体。
+Public Enum CellStatus
+■表３：Cellクラスの主なマンバ
+　	メンバ		型		説明
+	Status		CellStatus	黒・白・なしの状態
+	Grid		ReverseGrid	所属するグリッド
+	Position	Point		グリッド内での論理位置。通常は(0, 0) ～ (7, 7)のどれか。
+	Rectangle	Rectangle	実際に描画を行う四角形の領域。物理位置。
+
+■リスト７：Cell.vbに記述する。Cellクラスの骨格。
+Public Sub New(ByVal Grid As ReverseGrid, ByVal Position As Point)
+■リスト８：ReverseGrid.vbに記述する。６４個のセルを生成する処理。
+Public Sub New()
+■リスト９：ReverseGrid.vbに記述する。外部から６４個のセルにアクセスするためのプロパティ。
+Public Property Cells(ByVal X As Integer, ByVal Y As Integer) As Cell
+■リスト１０：Cell.vbに記述する。セルの状態を描画するロジック。
+Public Sub Draw(ByVal g As Graphics)
+■リスト１１：ReverseGrid.vbに記述する。セルの状態の描画を追加。
+Public Sub Draw(ByVal g As Graphics)
+■リスト１２：Form1に記述する。セルの状態描画のテスト。
+Private Sub PictureBox1_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles PictureBox1.Click
+■画像３：石の描画
+■リスト１３：ReverseGrid.vbに記述する。座標の位置にあるセルを取得する。
+Public Function CellFromPoint(ByVal X As Integer, ByVal Y As Integer) As Cell
+■リスト１４：Form1に記述する。クリックした位置に黒い石を置く。
+Private Sub PictureBox1_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles PictureBox1.Click
+■画像４：クリックした位置に石を置く
+
+５．かっこよくする
+■リスト１５：Cell.vbに記述する。セルの描画処理の改良版。
+Public Sub Draw(ByVal g As Graphics)
+■画像５：石を少しだけかっこよく描画する
+■リスト１６：Cell.vbに記述する。セルのアクティブ化。
+Public Sub Focus()
+■リスト１７：Cell.vbに記述する。アクティブな場合に枠を描画する処理の追加。
+Public Sub Draw(ByVal g As Graphics)
+■リスト１８：Form1に記述する。マウスの位置にあるセルをアクティブにする。
+Private Sub PictureBox1_MouseMove(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs) Handles PictureBox1.MouseMove
+■画像６：アクティブなセルをオレンジの枠で描画
+
+６．黒と白を交互に置く
+■リスト１９：Form1に記述する。ターン交代処理。
+Public Sub ChangeTurn()
+■リスト２０：Form1に記述する。石を置いたタイミングでターンを交代するようにする。
+Private Sub PictureBox1_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles PictureBox1.Click
+■画像７：黒と白を交互に置く
+
+７．石を置けないところを判定する
+■リスト２１：ReverseGrid.vbに記述する。左方向にひっくり返せる石の数を数える。
+Public Function ReversibleCount(ByVal Status As CellStatus, ByVal X As Integer, ByVal Y As Integer) As Integer
+■リスト２２：Form1に記述する。左方向にひっくり返せる石の数を正しく数えられているか表示して確認する。
+Private Sub PictureBox1_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles PictureBox1.Click
+■リスト２３：Constants.vbに記述する。八方向を表す構造体。
+Public Enum ScanDirection
+■リスト２４：ReverseGrid.vbに記述する。全方向に対してひっくり返せる石の合計数を調べる。
+Public Overloads Function ReversibleCount(ByVal Status As CellStatus, ByVal X As Integer, ByVal Y As Integer) As Integer
+Private Overloads Function ReversibleCount(ByVal Status As CellStatus, ByVal Direction As ScanDirection, ByVal X As Integer, ByVal Y As Integer) As Integer
+■リスト２５：ReverseGrid.vbに記述する。石を置くことができるか調べる。
+Public Function CanPut(ByVal Status As CellStatus, ByVal X As Integer, ByVal Y As Integer) As Boolean
+■リスト２６：Form1に記述する。石がひっくり返せる場合にのみ石を置くことを許可する。
+Private Sub PictureBox1_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles PictureBox1.Click
+■リスト２７：ReverseGrid.vbに記述する。オセロの最初の状態をセットする。
+Public Sub Initialize()
+■リスト２８：Form1に記述する。オセロの最初の状態をセットする。
+Private Sub Form1_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
+
+８．石をひっくり返す
+■リスト２９：石をひっくり返せるかテストするコード。試す場合はボタンか何かを貼り付けてForm1に記述する。
+Select Case ThisCell.Status
+■リスト３０：ReverseGrid.vbに記述する。石をひっくり返す。
+Public Sub Reverse(ByVal Status As CellStatus, ByVal Direction As ScanDirection, ByVal X As Integer, ByVal Y As Integer)
+■リスト３１：ReverseGrid.vbに記述する。石を置いたときの処理をまとめたもの。
+Public Function Put(ByVal Status As CellStatus, ByVal X As Integer, ByVal Y As Integer) As Boolean
+■リスト３２：Form1に記述する。よりスマートになった石を置く処理。
+Private Sub PictureBox1_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles PictureBox1.Click
+
+９．イベントによる布石
+■リスト３３：ReverseGrid.vbに記述する。イベントの宣言。
+Public Event Reversed(ByVal sender As Object, ByVal e As EventArgs)
+Public Event PutNew(ByVal sender As Object, ByVal e As EventArgs)
+■リスト３４：ReverseGrid.vbに記述する。PutNewイベントを発生させる。
+Public Function Put(ByVal Status As CellStatus, ByVal X As Integer, ByVal Y As Integer) As Boolean
+■リスト３５：ReverseGrid.vbに記述する。Reversedイベントを発生させる。
+Public Sub Reverse(ByVal Status As CellStatus, ByVal Direction As ScanDirection, ByVal X As Integer, ByVal Y As Integer)
+
+１０．勝敗判定と画面表示
+■画像８：コントロールの配置
+■表４：配置するコントロールのプロパティ
+コントロール	プロパティ	値
+lblBlackCount
+(Label)		TextAlign	MiddleRight
+		Text		0
+lblBlackTurn
+(Label)		BackColor	Red
+		Text		(空にする)
+lblWhiteCount
+(Label)		TextAlign	MiddleRight
+		Text		0
+lblWhiteTurn
+(Label)		BackColor	Red
+		Text		(空にする)
+■リスト３６：ReverseGrid.vbに記述する。グリッド上にある白い石・黒い石の数を数える。石が置かれていないセルの数を数えることもできる。
+Public ReadOnly Property Count(ByVal Status As CellStatus) As Integer
+■リスト３７：Form1に記述する。黒と白の石の数を画面に表示する。
+Private Sub Grid_PutNew(ByVal sender As Object, ByVal e As System.EventArgs) Handles Grid.PutNew
+Private Sub Grid_Reversed(ByVal sender As Object, ByVal e As System.EventArgs) Handles Grid.Reversed
+■リスト３８：Form1に記述する。ゲーム開始時にも黒と白の石の数を表示する。
+Private Sub Form1_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
+■リスト３９：Form1に記述する。ターン交代のタイミングで現在のターンを画面に表示する。
+Public Sub ChangeTurn()
+■リスト４０：Form1に記述する。ゲーム開始時にも現在のターンを表示する。
+Private Sub Form1_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
+■表５：勝敗が決定するとき
+勝敗が決定するとき
+すべてのセルに石が置かれたとき
+すべての石が黒または白になったとき
+どちらも石を置く場所がなくなったとき
+■リスト４１：ReverseGrid1.vbに記述する。ひっくり返せる石の数を数える。
+Public Function PuttableCount(ByVal Status As CellStatus) As Integer
+■リスト４２：Form1に記述する。勝敗判定・パス判定。
+Public Sub ChangeTurn()
+
+１１．効果
+■リスト４３：Form1に記述する。石を１つ１つゆっくりひっくり返す。
+Private Sub Grid_Reversed(ByVal sender As Object, ByVal e As System.EventArgs) Handles Grid.Reversed
+
+１２．コンピュータとの対戦
+■リスト４４：Computer1.vbに記述する。最も単純なAI。
+Public Class Computer1
+■リスト４５：Form1に記述する。コンピュータの宣言。
+Dim Computer As New Computer1(Grid, CellStatus.White)
+■リスト４６：Form1に記述する。人間とコンピュータが交互に石を置くようにする。
+Public Sub ChangeTurn()
+■リスト４７：Form1に記述する。ゲームを開始するために必要な処理をまとめる。
+Private Sub Start(ByVal PlayerColor As CellStatus)
+■画像９：ボタンの追加
+■リスト４８：Form1に記述する。人間が先手でも後手でも開始できるようにする。
+Private Sub btnStartBlack_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnStartBlack.Click
+Private Sub btnStartWhite_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnStartWhite.Click
+
+１３．AIの作成
+■リスト４９：Computer2.vbに記述する。少しだけましになったAI。まだまだ弱い。
+Public Class Computer2
+Public Sub Put()
+■リスト５０：ReverseGrid.vbに記述する。現在のグリッドと同じ状態を持つ新しいグリッド作成する。
+Public Function Copy() As ReverseGrid
+■リスト５１：新しいグリッドを使って１手先をシミュレーションする例
+ImageGrid.Put(CellStatus.Black, 1, 1)
+■リスト５２：Computer3.vbに記述する。ちょっと強くなったAI。小学校低学年レベル。
+Public Class Computer3
+Public Sub Put()
+このAIと対戦するためにフォームのComputerの宣言を変更するのを忘れないでください。
